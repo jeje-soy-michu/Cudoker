@@ -4,41 +4,57 @@
 
 TEST(Player, defaultStack)
 {
-    Player *p = new Player();
-    
-    EXPECT_EQ(p->get_stack(), 100);
+  Player *p = new Player();
+
+  EXPECT_EQ(p->get_stack(), 100);
 }
 
 TEST(Player, differentStack)
 {
-    Player *p = new Player(200);
-    
-    EXPECT_EQ(p->get_stack(), 200);
+  Player *p = new Player(200);
+
+  EXPECT_EQ(p->get_stack(), 200);
 }
 
 TEST(Player, updateStack)
 {
-    Player *p = new Player();
-    
-    p->set_stack(150);
-    
-    EXPECT_EQ(p->get_stack(), 150);
+  Player *p = new Player();
+
+  p->set_stack(150);
+
+  EXPECT_EQ(p->get_stack(), 150);
 }
 
 TEST(Player, nextPlayer)
 {
-    Player *p = new Player(), *aux = new Player();
-    
-    p->set_next(aux);
-    
-    EXPECT_EQ(p->get_next(), aux);
+  Player *p = new Player(), *aux = new Player();
+
+  p->set_next(aux);
+
+  EXPECT_EQ(p->get_next(), aux);
 }
 
 TEST(Player, nextPlayerConstructor)
 {
-    Player *aux = new Player(), *p = new Player(aux);
-    
-    p->set_next(aux);
-    
-    EXPECT_EQ(p->get_next(), aux);
+  Player *aux = new Player(), *p = new Player(aux);
+
+  p->set_next(aux);
+
+  EXPECT_EQ(p->get_next(), aux);
+}
+
+TEST(Player, playerActive)
+{
+  Player *p = new Player();
+
+  EXPECT_EQ(p->is_active(), true);
+}
+
+TEST(Player, playerInactive)
+{
+  Player *p = new Player();
+
+  p->set_active(false);
+
+  EXPECT_EQ(p->is_active(), false);
 }
