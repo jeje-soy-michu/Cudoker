@@ -29,6 +29,8 @@ void Table::StartRound()
   Player *p = dealer_;
   int stack, bet;
 
+  pot_ = 0;
+
   if (0 < ante_) {
     do {
       p = p->get_next();
