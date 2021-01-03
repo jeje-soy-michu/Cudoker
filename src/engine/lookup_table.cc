@@ -67,7 +67,7 @@ LookupTable::LookupTable()
 
     printf("\rHandRanks - %.3f%", (float) num_id * 100 / 612976);	// show the progress -- counts to 612976 again
   }
-  printf("\r")
+  printf("\r");
   SaveToFile();
 }
 
