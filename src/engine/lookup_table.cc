@@ -15,7 +15,7 @@ LookupTable::LookupTable()
     return;
   }
   
-  int num_id, slot_id, card = 0;
+  int num_id, slot_id, card = 0, num_ids = 1;
   int64_t id;
   
   int64_t card_ids[612978];
@@ -33,7 +33,7 @@ LookupTable::LookupTable()
       id = MakeID(card_ids[num_id], card);   // get the new ID for it
       // and save it in the list if I am not on the 7th card
       if (numcards < 7) {
-        SaveID(id, card_ids);
+        SaveID(id, card_ids, &num_ids);
       }
     }
     printf("\rCard ID - %.3f%", (float) num_id * 100 / 612976);	  // show progress -- this counts up to 612976
@@ -47,7 +47,7 @@ LookupTable::LookupTable()
 
       if (numcards < 7) {
       	// when in the index mode (< 7 cards) get the id to save
-      	slot_id = SaveID(id, card_ids) * 53 + 53;
+      	slot_id = SaveID(id, card_ids, &num_ids) * 53 + 53;
       } else {
       	// if I am at the 7th card, get the equivalence class ("hand rank") to save
       	slot_id = DoEval(id);
@@ -157,15 +157,15 @@ int LookupTable::DoEval(int64_t IDin)
       // I need to get the min for the permutations
     case 6 :
       holdrank = eval_5hand_fast(wk[0],wk[1],wk[2],wk[3],wk[4]);
-      holdrank = min( holdrank,
+      holdrank = std::min( holdrank,
 		      eval_5hand_fast(wk[0],wk[1],wk[2],wk[3],wk[5]));
-      holdrank = min( holdrank,
+      holdrank = std::min( holdrank,
 		      eval_5hand_fast(wk[0],wk[1],wk[2],wk[4],wk[5]));
-      holdrank = min( holdrank,
+      holdrank = std::min( holdrank,
 		      eval_5hand_fast(wk[0],wk[1],wk[3],wk[4],wk[5]));
-      holdrank = min( holdrank,
+      holdrank = std::min( holdrank,
 		      eval_5hand_fast(wk[0],wk[2],wk[3],wk[4],wk[5]));
-      holdrank = min( holdrank,
+      holdrank = std::min( holdrank,
 		      eval_5hand_fast(wk[1],wk[2],wk[3],wk[4],wk[5]));
       break;
     case 7 : holdrank = eval_7hand(wk);
@@ -306,40 +306,40 @@ int64_t LookupTable::MakeID(int64_t IDin, int newcard)
   return ID;
 }
 
-int LookupTable::SaveID(int64_t ID, int64_t *card_ids)
+int LookupTable::SaveID(int64_t id, int64_t *card_ids, int *num_ids)
 {
   // this inserts a hand ID into the IDs array.
 
-  if (ID == 0) return 0; // don't use up a record for a 0!
+  if (id == 0) return 0; // don't use up a record for a 0!
 
   // take care of the most likely first goes on the end...
-  if (ID >= maxID) {
-    if (ID > maxID) { // greater than create new else it was the last one!
-      card_ids[numIDs++] = ID;  // add the new ID
-      maxID = ID;
+  if (id >= maxID) {
+    if (id > maxID) { // greater than create new else it was the last one!
+      card_ids[num_ids++] = id;  // add the new ID
+      maxID = id;
     }
-    return numIDs - 1;
+    return num_ids - 1;
   }
 
   // find the slot (by a pseudo bsearch algorithm)
   int low = 0;
-  int high = numIDs - 1;
+  int high = num_ids - 1;
   int64_t testval;
   int holdtest;
 
   while (high - low > 1) {
     holdtest = (high + low + 1) / 2;
-    testval = card_ids[holdtest] - ID;
+    testval = card_ids[holdtest] - id;
     if (testval > 0) high = holdtest;
     else if (testval < 0) low = holdtest;
     else return holdtest;   // got it!!
   }
   // it couldn't be found so must be added to the current location (high)
   // make space...  // don't expect this much!
-  memmove(&card_ids[high + 1], &card_ids[high], (numIDs - high) * sizeof(card_ids[0]));
+  memmove(&card_ids[high + 1], &card_ids[high], (num_ids - high) * sizeof(card_ids[0]));
 
-  card_ids[high] = ID;   // do the insert into the hole created
-  numIDs++;
+  card_ids[high] = id;   // do the insert into the hole created
+  num_ids++;
   return high;
 }
 
